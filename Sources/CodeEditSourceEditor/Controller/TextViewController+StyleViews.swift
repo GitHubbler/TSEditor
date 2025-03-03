@@ -59,6 +59,9 @@ extension TextViewController {
     /// Style the scroll view.
     package func styleScrollView() {
         guard let scrollView = view as? NSScrollView else { return }
+        
+        scrollView.isFindBarVisible = false
+        
         scrollView.drawsBackground = useThemeBackground
         scrollView.backgroundColor = useThemeBackground ? theme.background : .clear
         if let contentInsets {
@@ -72,11 +75,14 @@ extension TextViewController {
         scrollView.contentInsets.bottom = (contentInsets?.bottom ?? 0) + bottomContentInsets
         
         
-        print("//debug 2503030700 scrollView.superview?.superview?.frame: \(scrollView.superview?.superview?.frame ?? CGRect.zero)")
-        print("//debug 2503030700 scrollView.superview?.frame: \(scrollView.superview?.frame ?? CGRect.zero)")
-        print("//debug 2503030700 scrollView.frame: \(scrollView.frame)")
-        print("//debug 2503030700 scrollView.contentView.frame: \(scrollView.contentView.frame)")
-        print("//debug 2503030700 scrollView.contentView.subviews.first?.frame: \(scrollView.contentView.subviews.first?.frame ?? CGRect.zero)")
-        print("//debug 2503030700 scrollView.contentView.subviews.first?.subviews.first?.frame: \(scrollView.contentView.subviews.first?.subviews.first?.frame ?? CGRect.zero)")
+        scrollView.contentInsets.top = -50
+        
+        
+//        print("//debug 2503030700 scrollView.superview?.superview?.frame: \(scrollView.superview?.superview?.frame ?? CGRect.zero)")
+//        print("//debug 2503030700 scrollView.superview?.frame: \(scrollView.superview?.frame ?? CGRect.zero)")
+//        print("//debug 2503030700 scrollView.frame: \(scrollView.frame)")
+//        print("//debug 2503030700 scrollView.contentView.frame: \(scrollView.contentView.frame)")
+//        print("//debug 2503030700 scrollView.contentView.subviews.first?.frame: \(scrollView.contentView.subviews.first?.frame ?? CGRect.zero)")
+//        print("//debug 2503030700 scrollView.contentView.subviews.first?.subviews.first?.frame: \(scrollView.contentView.subviews.first?.subviews.first?.frame ?? CGRect.zero)")
     }
 }
