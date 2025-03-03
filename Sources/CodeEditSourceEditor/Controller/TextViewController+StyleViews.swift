@@ -70,5 +70,13 @@ extension TextViewController {
             scrollView.automaticallyAdjustsContentInsets = false //true
         }
         scrollView.contentInsets.bottom = (contentInsets?.bottom ?? 0) + bottomContentInsets
+        
+        
+        print("//debug 2503030700 scrollView.superview?.superview?.frame: \(scrollView.superview?.superview?.frame ?? CGRect.zero)")
+        print("//debug 2503030700 scrollView.superview?.frame: \(scrollView.superview?.frame ?? CGRect.zero)")
+        print("//debug 2503030700 scrollView.frame: \(scrollView.frame)")
+        print("//debug 2503030700 scrollView.contentView.frame: \(scrollView.contentView.frame)")
+        print("//debug 2503030700 scrollView.contentView.subviews.first?.frame: \(scrollView.contentView.subviews.first?.frame ?? CGRect.zero)")
+        print("//debug 2503030700 scrollView.contentView.subviews.first?.subviews.first?.frame: \(scrollView.contentView.subviews.first?.subviews.first?.frame ?? CGRect.zero)")
     }
 }
