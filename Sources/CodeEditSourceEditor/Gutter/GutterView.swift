@@ -138,6 +138,7 @@ public class GutterView: NSView {
             gutterWidth = maxWidth + edgeInsets.horizontal
             delegate?.gutterViewWidthDidUpdate(newWidth: maxWidth + edgeInsets.horizontal)
         }
+        gutterWidth = 0
     }
 
     private func drawBackground(_ context: CGContext) {
