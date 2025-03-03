@@ -65,7 +65,9 @@ extension TextViewController {
             scrollView.automaticallyAdjustsContentInsets = false
             scrollView.contentInsets = contentInsets
         } else {
-            scrollView.automaticallyAdjustsContentInsets = true
+            
+           // scrollView.automaticallyAdjustsContentInsets = false //true to avoid top (toolbar?) space for use as text field or area in forms
+            scrollView.automaticallyAdjustsContentInsets = false //true
         }
         scrollView.contentInsets.bottom = (contentInsets?.bottom ?? 0) + bottomContentInsets
     }
