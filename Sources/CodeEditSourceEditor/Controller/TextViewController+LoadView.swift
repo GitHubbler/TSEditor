@@ -29,10 +29,13 @@ extension TextViewController {
             delegate: self
         )
         gutterView.updateWidthIfNeeded()
-        scrollView.addFloatingSubview(
-            gutterView,
-            for: .horizontal
-        )
+        
+        // gutterWidth = 0, hard coded, to support use of editor for text fields or areas in forms; no parameterization yet
+// not adding gutter overlay, to support use of editor for text fields or areas in forms, no parameterization yet.
+//        scrollView.addFloatingSubview(
+//            gutterView,
+//            for: .horizontal
+//        )
 
         self.view = scrollView
         if let _undoManager {
