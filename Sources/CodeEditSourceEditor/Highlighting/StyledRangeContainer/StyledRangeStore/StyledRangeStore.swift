@@ -73,6 +73,16 @@ final class StyledRangeStore {
     ///   - runs: The runs to insert.
     ///   - range: The range to replace.
     func set(runs: [Run], for range: Range<Int>) {
+        
+        // debug 2503041126 Rope utility has a bug--the following trips:
+//        precondition(
+//          bounds.lowerBound >= 0 && bounds.upperBound <= size,
+//          "Range out of bounds")
+        // this may be a workaround
+        guard range.lowerBound >= 0 && range.upperBound <= OffsetMetric().size(of: _guts.summary) else {
+            return
+        }
+        
         _guts.replaceSubrange(
             range,
             in: OffsetMetric(),
