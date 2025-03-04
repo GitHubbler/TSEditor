@@ -59,30 +59,14 @@ extension TextViewController {
     /// Style the scroll view.
     package func styleScrollView() {
         guard let scrollView = view as? NSScrollView else { return }
-        
-        scrollView.isFindBarVisible = false
-        
         scrollView.drawsBackground = useThemeBackground
         scrollView.backgroundColor = useThemeBackground ? theme.background : .clear
         if let contentInsets {
             scrollView.automaticallyAdjustsContentInsets = false
             scrollView.contentInsets = contentInsets
         } else {
-            
-           // scrollView.automaticallyAdjustsContentInsets = false //true to avoid top (toolbar?) space for use as text field or area in forms
-            scrollView.automaticallyAdjustsContentInsets = false //true
+            scrollView.automaticallyAdjustsContentInsets = true
         }
         scrollView.contentInsets.bottom = (contentInsets?.bottom ?? 0) + bottomContentInsets
-        
-        
-        scrollView.contentInsets.top = -50
-        
-        
-//        print("//debug 2503030700 scrollView.superview?.superview?.frame: \(scrollView.superview?.superview?.frame ?? CGRect.zero)")
-//        print("//debug 2503030700 scrollView.superview?.frame: \(scrollView.superview?.frame ?? CGRect.zero)")
-//        print("//debug 2503030700 scrollView.frame: \(scrollView.frame)")
-//        print("//debug 2503030700 scrollView.contentView.frame: \(scrollView.contentView.frame)")
-//        print("//debug 2503030700 scrollView.contentView.subviews.first?.frame: \(scrollView.contentView.subviews.first?.frame ?? CGRect.zero)")
-//        print("//debug 2503030700 scrollView.contentView.subviews.first?.subviews.first?.frame: \(scrollView.contentView.subviews.first?.subviews.first?.frame ?? CGRect.zero)")
     }
 }
