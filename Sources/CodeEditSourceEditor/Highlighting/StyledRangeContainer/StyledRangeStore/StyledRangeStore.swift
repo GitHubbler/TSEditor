@@ -35,6 +35,17 @@ final class StyledRangeStore {
     /// - Parameter range: The range to query.
     /// - Returns: A continuous array of runs representing the queried range.
     func runs(in range: Range<Int>) -> [Run] {
+        
+        //debug 2503041713 assertion failed. Trying a workaround:
+        var range = range // in; mutable for possible adjustment
+        if range.upperBound > _guts.count(in: OffsetMetric()) { // upperBound outside valid range
+            let existingLength = range.length
+//            range.length = _guts.count(in: OffsetMetric())
+            let overshoot = existingLength - _guts.count(in: OffsetMetric())
+            let newRange = Range<Int>(lowerBound: range.lowerBound, length: existingLength - overshoot)
+            range = newRange
+        }
+
         assert(range.lowerBound >= 0, "Negative lowerBound")
         assert(range.upperBound <= _guts.count(in: OffsetMetric()), "upperBound outside valid range")
         if let cache, cache.range == range {
