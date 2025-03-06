@@ -282,6 +282,11 @@ extension Highlighter: StyledRangeContainerDelegate {
 
         textView.textStorage.endEditing()
         textView.layoutManager.endTransaction()
+        
+        //debug 2503060948 bug workaround elsewhere causes infiniteloop throu invalidation
+        guard !textView.textStorage.string.isEmpty else { return }
+        
+        
         textView.layoutManager.invalidateLayoutForRange(range)
     }
 }
