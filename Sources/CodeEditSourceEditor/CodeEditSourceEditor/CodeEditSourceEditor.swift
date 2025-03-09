@@ -250,7 +250,7 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
 
         // **START: Text Content Update Logic**
         if !context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 switch text {
                 case .binding(let binding):
                     // Update text content from binding in updateNSViewController
