@@ -250,16 +250,17 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
 
         // **START: Text Content Update Logic**
         if !context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
-            switch text {
-            case .binding(let binding):
-                // Update text content from binding in updateNSViewController
-                controller.textView.setText(binding.wrappedValue)
-            case .storage(let textStorage):
-                controller.textView.setTextStorage(textStorage) // Or handle NSTextStorage updates if needed.
+            DispatchQueue.main.async {
+                switch text {
+                case .binding(let binding):
+                    // Update text content from binding in updateNSViewController
+                    controller.textView.setText(binding.wrappedValue)
+                case .storage(let textStorage):
+                    controller.textView.setTextStorage(textStorage) // Or handle NSTextStorage updates if needed.
+                }
             }
         }
         // **END: Text Content Update Logic**
-
 
         // Do manual diffing to reduce the amount of reloads for other parameters.
         // This helps a lot in view performance, as it otherwise gets triggered on each environment change.
