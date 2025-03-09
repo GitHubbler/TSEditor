@@ -249,12 +249,14 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         controller.textCoordinators = coordinators.map { WeakCoordinator($0) }
 
         // **START: Text Content Update Logic**
-        switch text {
-        case .binding(let binding):
-            // Update text content from binding in updateNSViewController
-            controller.textView.setText(binding.wrappedValue)
-        case .storage(let textStorage):
-            controller.textView.setTextStorage(textStorage) // Or handle NSTextStorage updates if needed.
+        if !context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
+            switch text {
+            case .binding(let binding):
+                // Update text content from binding in updateNSViewController
+                controller.textView.setText(binding.wrappedValue)
+            case .storage(let textStorage):
+                controller.textView.setTextStorage(textStorage) // Or handle NSTextStorage updates if needed.
+            }
         }
         // **END: Text Content Update Logic**
 
