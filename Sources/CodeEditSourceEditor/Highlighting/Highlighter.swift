@@ -276,6 +276,8 @@ extension Highlighter: StyledRangeContainerDelegate {
             guard let range = NSRange(location: offset, length: run.length).intersection(range) else {
                 continue
             }
+            //debug 2503081830 workaround for crash using editor for suggesting text field
+            guard range.upperBound <= storage?.length ?? 0 else { continue }
             storage?.setAttributes(attributeProvider.attributesFor(run.capture), range: range)
             offset += range.length
         }
