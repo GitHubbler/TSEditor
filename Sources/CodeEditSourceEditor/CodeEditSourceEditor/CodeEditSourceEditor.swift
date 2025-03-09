@@ -249,7 +249,7 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         controller.textCoordinators = coordinators.map { WeakCoordinator($0) }
 
         // **START: Text Content Update Logic**
-        if !context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
+        if context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 switch text {
                 case .binding(let binding):
