@@ -45,7 +45,9 @@ extension CodeEditSourceEditor {
                 return
             }
             if case .binding(let binding) = text {
-                binding.wrappedValue = textView.string
+                Task { DispatchQueue.main.async {
+                    binding.wrappedValue = textView.string
+                } }
             }
         }
 
