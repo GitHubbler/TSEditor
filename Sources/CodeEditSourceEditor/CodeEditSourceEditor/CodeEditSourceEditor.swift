@@ -248,21 +248,7 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         // Set this no matter what to avoid having to compare object pointers.
         controller.textCoordinators = coordinators.map { WeakCoordinator($0) }
 
-//        // **START: Text Content Update Logic**
-//        if context.coordinator.isUpdateFromTextView { // Only update if user is NOT editing
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-//                switch text {
-//                case .binding(let binding):
-//                    // Update text content from binding in updateNSViewController
-//                    controller.textView.setText(binding.wrappedValue)
-//                case .storage(let textStorage):
-//                    controller.textView.setTextStorage(textStorage) // Or handle NSTextStorage updates if needed.
-//                }
-//            }
-//        }
-//        // **END: Text Content Update Logic**
-
-        // Do manual diffing to reduce the amount of reloads for other parameters.
+        // Do manual diffing to reduce the amount of reloads.
         // This helps a lot in view performance, as it otherwise gets triggered on each environment change.
         guard !paramsAreEqual(controller: controller) else {
             return
