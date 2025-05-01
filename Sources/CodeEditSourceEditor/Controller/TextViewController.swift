@@ -23,7 +23,7 @@ public class TextViewController: NSViewController { // swiftlint:disable:this ty
     weak var findViewController: FindViewController?
 
     var scrollView: NSScrollView!
-    var textView: TextView!
+    internal(set) public var textView: TextView!
     var gutterView: GutterView!
     var minimapView: MinimapView!
 
