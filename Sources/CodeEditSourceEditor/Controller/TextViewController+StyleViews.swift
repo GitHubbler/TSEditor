@@ -22,10 +22,11 @@ extension TextViewController {
         textView.postsFrameChangedNotifications = true
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.selectionManager.selectionBackgroundColor = theme.selection
-        textView.selectionManager.selectedLineBackgroundColor = .blue // getThemeBackground()
+        textView.selectionManager.selectedLineBackgroundColor = .clear // getThemeBackground()
+        //debug 2505021239 passing .clear from theme causes a crash; overriding in func styleTextView() does not crash.
         textView.selectionManager.highlightSelectedLine = isEditable
         textView.selectionManager.insertionPointColor = theme.insertionPoint
-        textView.enclosingScrollView?.backgroundColor = .red // useThemeBackground ? theme.background : .clear
+        textView.enclosingScrollView?.backgroundColor = .clear // useThemeBackground ? theme.background : .clear
         paragraphStyle = generateParagraphStyle()
         textView.typingAttributes = attributesFor(nil)
     }
