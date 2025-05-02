@@ -35,6 +35,17 @@ final class StyledRangeStore {
     /// - Parameter range: The range to query.
     /// - Returns: A continuous array of runs representing the queried range.
     func runs(in range: Range<Int>) -> [Run] {
+        
+        //debug 2503041713 assertion failed. Trying a workaround:
+        var range = range // in; mutable for possible adjustment
+        if range.upperBound > _guts.count(in: OffsetMetric()) { // upperBound outside valid range
+        let existingLength = range.length
+//        range.length = _guts.count(in: OffsetMetric()) CAN'T SET--workaround follows:
+        let overshoot = existingLength - _guts.count(in: OffsetMetric())
+        let newRange = Range<Int>(lowerBound: range.lowerBound, length: existingLength - overshoot)
+        range = newRange
+        }
+        
         assert(range.lowerBound >= 0, "Negative lowerBound")
         assert(range.upperBound <= _guts.count(in: OffsetMetric()), "upperBound outside valid range")
         if let cache, cache.range == range {
@@ -73,6 +84,16 @@ final class StyledRangeStore {
     ///   - runs: The runs to insert.
     ///   - range: The range to replace.
     func set(runs: [Run], for range: Range<Int>) {
+        
+        // debug 2503041126 Rope utility has a bug--the following trips:
+        //        precondition(
+        //          bounds.lowerBound >= 0 && bounds.upperBound <= size,
+        //          "Range out of bounds")
+        // this may be a workaround
+        guard range.lowerBound >= 0 && range.upperBound <= OffsetMetric().size(of: _guts.summary) else {
+            return
+        }
+        
         let gutsRange = 0..<_guts.count(in: OffsetMetric())
         if range.clamped(to: gutsRange) != range {
             let upperBound = range.clamped(to: gutsRange).upperBound

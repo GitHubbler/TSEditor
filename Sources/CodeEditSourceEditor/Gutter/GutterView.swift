@@ -157,6 +157,8 @@ public class GutterView: NSView {
             gutterWidth = maxWidth + edgeInsets.horizontal
             delegate?.gutterViewWidthDidUpdate(newWidth: maxWidth + edgeInsets.horizontal)
         }
+        // gutterWidth = 0, hard coded, to support use of editor for text fields or areas in forms; no parameterization yet
+        gutterWidth = 0
     }
 
     private func drawBackground(_ context: CGContext) {
