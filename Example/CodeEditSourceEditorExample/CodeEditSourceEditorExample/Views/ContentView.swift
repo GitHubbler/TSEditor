@@ -51,7 +51,7 @@ struct ContentView: View {
                     wrapLines: wrapLines,
                     editorOverscroll: 0.3,
                     cursorPositions: $cursorPositions,
-                    useThemeBackground: true,
+                    useThemeBackground: false, //debug 2505021549 "false" ==> clear background; cannot pass .clear from theme
                     highlightProviders: [treeSitterClient],
                     contentInsets: NSEdgeInsets(top: proxy.safeAreaInsets.top, left: 0, bottom: 28.0, right: 0),
                     additionalTextInsets: NSEdgeInsets(top: 1, left: 0, bottom: 1, right: 0),

@@ -15,7 +15,7 @@ extension EditorTheme {
             text: Attribute(color: NSColor(hex: "000000")),
             insertionPoint: NSColor(hex: "000000"),
             invisibles: Attribute(color: NSColor(hex: "D6D6D6")),
-            background: NSColor(hex: "FFFFFF"),
+            background: NSColor(hex: "FFFFFF"), //debug 2505021549 useThemeBackground: false ==> clear background; cannot pass .clear from theme
             lineHighlight: NSColor(hex: "ECF5FF"),
             selection: NSColor(hex: "B2D7FF"),
             keywords: Attribute(color: NSColor(hex: "9B2393"), bold: true),
@@ -35,7 +35,7 @@ extension EditorTheme {
             text: Attribute(color: NSColor(hex: "FFFFFF")),
             insertionPoint: NSColor(hex: "007AFF"),
             invisibles: Attribute(color: NSColor(hex: "53606E")),
-            background: NSColor(hex: "292A30"),
+            background: NSColor(hex: "292A30"), //debug 2505021549 useThemeBackground: false ==> clear background; cannot pass .clear from theme
             lineHighlight: NSColor(hex: "2F3239"),
             selection: NSColor(hex: "646F83"),
             keywords: Attribute(color: NSColor(hex: "FF7AB2"), bold: true),
