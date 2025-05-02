@@ -22,11 +22,17 @@ extension TextViewController {
         textView.postsFrameChangedNotifications = true
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.selectionManager.selectionBackgroundColor = theme.selection
-        textView.selectionManager.selectedLineBackgroundColor = getThemeBackground()
+        
+        textView.selectionManager.selectedLineBackgroundColor = getThemeBackground() //debug 2505021618 which actually gets the theme.lineHighlight IFF using theme background... otherwise a default visible blue. So to actually not have the highlight:
+        textView.selectionManager.selectedLineBackgroundColor = useThemeBackground ? textView.selectionManager.selectedLineBackgroundColor : .clear
+        
         textView.selectionManager.highlightSelectedLine = isEditable
         textView.selectionManager.insertionPointColor = theme.insertionPoint
+        
         textView.enclosingScrollView?.backgroundColor = useThemeBackground ? theme.background : .clear
+        //debug 2505021617 but actually using .clear doesn't work, so just don't draw the background
         textView.enclosingScrollView?.drawsBackground = textView.enclosingScrollView?.backgroundColor != .clear
+        
         paragraphStyle = generateParagraphStyle()
         textView.typingAttributes = attributesFor(nil)
     }
