@@ -26,7 +26,8 @@ extension TextViewController {
         //debug 2505021239 passing .clear from theme causes a crash; overriding in func styleTextView() does not crash.
         textView.selectionManager.highlightSelectedLine = isEditable
         textView.selectionManager.insertionPointColor = theme.insertionPoint
-        textView.enclosingScrollView?.backgroundColor = .clear // useThemeBackground ? theme.background : .clear
+        textView.enclosingScrollView?.backgroundColor = .blue // useThemeBackground ? theme.background : .clear
+        
         paragraphStyle = generateParagraphStyle()
         textView.typingAttributes = attributesFor(nil)
     }
@@ -66,6 +67,8 @@ extension TextViewController {
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = !wrapLines
         scrollView.scrollerStyle = .overlay
+        
+//        scrollView.backgroundColor = ... already handled in func styleTextView()
     }
 
     package func styleMinimapView() {
