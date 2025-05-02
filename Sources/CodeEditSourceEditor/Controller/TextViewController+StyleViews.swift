@@ -22,10 +22,10 @@ extension TextViewController {
         textView.postsFrameChangedNotifications = true
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.selectionManager.selectionBackgroundColor = theme.selection
-        textView.selectionManager.selectedLineBackgroundColor = getThemeBackground()
+        textView.selectionManager.selectedLineBackgroundColor = .blue // getThemeBackground()
         textView.selectionManager.highlightSelectedLine = isEditable
         textView.selectionManager.insertionPointColor = theme.insertionPoint
-        textView.enclosingScrollView?.backgroundColor = useThemeBackground ? theme.background : .clear
+        textView.enclosingScrollView?.backgroundColor = .red // useThemeBackground ? theme.background : .clear
         paragraphStyle = generateParagraphStyle()
         textView.typingAttributes = attributesFor(nil)
     }
