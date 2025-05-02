@@ -23,7 +23,8 @@ extension TextViewController {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.selectionManager.selectionBackgroundColor = theme.selection
         
-        textView.selectionManager.selectedLineBackgroundColor = getThemeBackground() //debug 2505021618 which actually gets the theme.lineHighlight IFF using theme background... otherwise a default visible blue. So to actually not have the highlight:
+        textView.selectionManager.selectedLineBackgroundColor = getThemeBackground() //debug 2505021618 which actually gets the theme.lineHighlight IFF using theme background...
+        // otherwise a default visible blue. So to actually not have the highlight:
         textView.selectionManager.selectedLineBackgroundColor = useThemeBackground ? textView.selectionManager.selectedLineBackgroundColor : .clear
         
         textView.selectionManager.highlightSelectedLine = isEditable
