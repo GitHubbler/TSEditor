@@ -45,9 +45,9 @@ let package = Package(
                 "CodeEditLanguages",
                 "TextFormation"
             ],
-            plugins: [
-                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ]
+//            plugins: [
+//                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+//            ]
         ),
 
         // Tests for the source editor
@@ -58,9 +58,9 @@ let package = Package(
                 "CodeEditLanguages",
                 .product(name: "CustomDump", package: "swift-custom-dump")
             ],
-            plugins: [
-                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ]
+//            plugins: [
+//                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+//            ]
         ),
     ]
 )
