@@ -34,7 +34,7 @@ final class MinimapLineRenderer: TextLayoutManagerRenderDelegate {
             range: range,
             stringRef: stringRef,
             markedRanges: markedRanges,
-            breakStrategy: breakStrategy
+            attachments: []
         )
 
         // Make all fragments 2px tall
@@ -62,6 +62,7 @@ final class MinimapLineRenderer: TextLayoutManagerRenderDelegate {
 
     func characterXPosition(in lineFragment: LineFragment, for offset: Int) -> CGFloat {
         // Offset is relative to the whole line, the CTLine is too.
-        return 8 + (CGFloat(offset - CTLineGetStringRange(lineFragment.ctLine).location) * 1.5)
+        return 12.0
+//        return 8 + (CGFloat(offset - CTLineGetStringRange(lineFragment.ctLine).location) * 1.5)
     }
 }
