@@ -26,12 +26,11 @@ struct StatusBar: View {
     @Binding var indentOption: IndentOption
     @Binding var reformatAtColumn: Int
     @Binding var showReformattingGuide: Bool
-    @Binding var invisibles: InvisibleCharactersConfig
 
     var body: some View {
         HStack {
             Menu {
-                IndentPicker(indentOption: $indentOption, enabled: document.text.length == 0)
+                IndentPicker(indentOption: $indentOption, enabled: document.text.isEmpty)
                     .buttonStyle(.borderless)
                 Toggle("Wrap Lines", isOn: $wrapLines)
                 Toggle("Show Minimap", isOn: $showMinimap)
@@ -50,33 +49,6 @@ struct StatusBar: View {
                     Toggle("Use System Cursor", isOn: $useSystemCursor)
                         .disabled(true)
                         .help("macOS 14 required")
-                }
-
-                Menu {
-                    Toggle("Spaces", isOn: $invisibles.showSpaces)
-                    Toggle("Tabs", isOn: $invisibles.showTabs)
-                    Toggle("Line Endings", isOn: $invisibles.showLineEndings)
-                    Divider()
-                    Toggle(
-                        "Warning Characters",
-                        isOn: Binding(
-                            get: {
-                                !invisibles.warningCharacters.isEmpty
-                            },
-                            set: { newValue in
-                                // In this example app, we only add one character
-                                // For real apps, consider providing a table where users can add UTF16
-                                // char codes to warn about, as well as a set of good defaults.
-                                if newValue {
-                                    invisibles.warningCharacters.insert(0x200B) // zero-width space
-                                } else {
-                                    invisibles.warningCharacters.removeAll()
-                                }
-                            }
-                        )
-                    )
-                } label: {
-                    Text("Invisibles")
                 }
             } label: {}
                 .background {
@@ -134,8 +106,8 @@ struct StatusBar: View {
         guard let fileURL else { return nil  }
         return CodeLanguage.detectLanguageFrom(
             url: fileURL,
-            prefixBuffer: document.text.string.getFirstLines(5),
-            suffixBuffer: document.text.string.getLastLines(5)
+            prefixBuffer: document.text.getFirstLines(5),
+            suffixBuffer: document.text.getLastLines(5)
         )
     }
 

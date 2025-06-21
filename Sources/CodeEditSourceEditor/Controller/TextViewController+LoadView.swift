@@ -23,7 +23,9 @@ extension TextViewController {
             delegate: self
         )
         gutterView.updateWidthIfNeeded()
-        scrollView.addFloatingSubview(gutterView, for: .horizontal)
+        // gutterWidth = 0, hard coded, to support use of editor for text fields or areas in forms; no parameterization yet
+        // not adding gutter overlay, to support use of editor for text fields or areas in forms, no parameterization yet.
+//        scrollView.addFloatingSubview(gutterView, for: .horizontal)
 
         guideView = ReformattingGuideView(
             column: self.reformatAtColumn,
@@ -106,7 +108,9 @@ extension TextViewController {
             object: scrollView.contentView,
             queue: .main
         ) { [weak self] notification in
-            guard let clipView = notification.object as? NSClipView else { return }
+            guard let clipView = notification.object as? NSClipView,
+                  let textView = self?.textView else { return }
+            textView.updatedViewport(self?.scrollView.documentVisibleRect ?? .zero)
             self?.gutterView.needsDisplay = true
             self?.minimapXConstraint?.constant = clipView.bounds.origin.x
         }
@@ -118,6 +122,7 @@ extension TextViewController {
             object: scrollView.contentView,
             queue: .main
         ) { [weak self] _ in
+            self?.textView.updatedViewport(self?.scrollView.documentVisibleRect ?? .zero)
             self?.gutterView.needsDisplay = true
             self?.emphasisManager?.removeEmphases(for: EmphasisGroup.brackets)
             self?.updateTextInsets()
@@ -217,7 +222,7 @@ extension TextViewController {
             self.findViewController?.showFindPanel()
             return nil
         case (0, "\u{1b}"): // Escape key
-            self.findViewController?.hideFindPanel()
+            self.findViewController?.findPanel.dismiss()
             return nil
         case (_, _):
             return event

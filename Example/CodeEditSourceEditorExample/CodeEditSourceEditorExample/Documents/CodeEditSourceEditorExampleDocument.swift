@@ -8,14 +8,10 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct CodeEditSourceEditorExampleDocument: FileDocument, @unchecked Sendable {
-    enum DocumentError: Error {
-        case failedToEncode
-    }
+struct CodeEditSourceEditorExampleDocument: FileDocument {
+    var text: String
 
-    var text: NSTextStorage
-
-    init(text: NSTextStorage = NSTextStorage(string: "")) {
+    init(text: String = "") {
         self.text = text
     }
 
@@ -29,31 +25,11 @@ struct CodeEditSourceEditorExampleDocument: FileDocument, @unchecked Sendable {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        var nsString: NSString?
-        NSString.stringEncoding(
-            for: data,
-            encodingOptions: [
-                // Fail if using lossy encoding.
-                .allowLossyKey: false,
-                // In a real app, you'll want to handle more than just this encoding scheme. Check out CodeEdit's
-                // implementation for a more involved solution.
-                .suggestedEncodingsKey: [NSUTF8StringEncoding],
-                .useOnlySuggestedEncodingsKey: true
-            ],
-            convertedString: &nsString,
-            usedLossyConversion: nil
-        )
-        if let nsString {
-            self.text = NSTextStorage(string: nsString as String)
-        } else {
-            fatalError("Failed to read file")
-        }
+        text = String(decoding: data, as: UTF8.self)
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        guard let data = (text.string as NSString?)?.data(using: NSUTF8StringEncoding) else {
-            throw DocumentError.failedToEncode
-        }
+        let data = Data(text.utf8)
         return .init(regularFileWithContents: data)
     }
 }

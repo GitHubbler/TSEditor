@@ -10,21 +10,27 @@ import CodeEditTextView
 
 /// Creates a container controller for displaying and hiding a find panel with a content view.
 final class FindViewController: NSViewController {
-    var viewModel: FindPanelViewModel
+    weak var target: FindPanelTarget?
 
     /// The amount of padding from the top of the view to inset the find panel by.
     /// When set, the safe area is ignored, and the top padding is measured from the top of the view's frame.
     var topPadding: CGFloat? {
         didSet {
-            if viewModel.isShowingFindPanel {
+            if isShowingFindPanel {
                 setFindPanelConstraintShow()
             }
         }
     }
 
     var childView: NSView
-    var findPanel: FindPanelHostingView
+    var findPanel: FindPanel!
+    var findMatches: [NSRange] = []
+
+    var currentFindMatchIndex: Int = 0
+    var findText: String = ""
     var findPanelVerticalConstraint: NSLayoutConstraint!
+
+    var isShowingFindPanel: Bool = false
 
     /// The 'real' top padding amount.
     /// Is equal to ``topPadding`` if set, or the view's top safe area inset if not.
@@ -33,12 +39,30 @@ final class FindViewController: NSViewController {
     }
 
     init(target: FindPanelTarget, childView: NSView) {
-        viewModel = FindPanelViewModel(target: target)
+        self.target = target
         self.childView = childView
-        findPanel = FindPanelHostingView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
-        viewModel.dismiss = { [weak self] in
-            self?.hideFindPanel()
+        self.findPanel = FindPanel(delegate: self, textView: target as? NSView)
+
+        // Add notification observer for text changes
+        if let textViewController = target as? TextViewController {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(textDidChange),
+                name: TextView.textDidChangeNotification,
+                object: textViewController.textView
+            )
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func textDidChange() {
+        // Only update if we have find text
+        if !findText.isEmpty {
+            performFind()
         }
     }
 
@@ -81,7 +105,7 @@ final class FindViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        if viewModel.isShowingFindPanel { // Update constraints for initial state
+        if isShowingFindPanel { // Update constraints for initial state
             findPanel.isHidden = false
             setFindPanelConstraintShow()
         } else {

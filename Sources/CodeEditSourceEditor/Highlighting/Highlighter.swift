@@ -17,7 +17,7 @@ import OSLog
 ///
 /// This class manages multiple objects that help perform this task:
 /// - ``StyledRangeContainer``
-/// - ``RangeStore``
+/// - ``StyledRangeStore``
 /// - ``VisibleRangeProvider``
 /// - ``HighlightProviderState``
 ///
@@ -34,12 +34,12 @@ import OSLog
 /// |
 /// | Queries coalesced styles
 /// v
-/// +-------------------------------+             +-------------------------+
-/// |    StyledRangeContainer       |   ------>   |      RangeStore[]       |
-/// |                               |             |                         | Stores styles for one provider
-/// |  - manages combined ranges    |             |  - stores raw ranges &  |
-/// |  - layers highlight styles    |             |    captures             |
-/// |  + getAttributesForRange()    |             +-------------------------+
+/// +-------------------------------+             +-----------------------------+
+/// |    StyledRangeContainer       |   ------>   |      StyledRangeStore[]     |
+/// |                               |             |                             | Stores styles for one provider
+/// |  - manages combined ranges    |             |  - stores raw ranges &      |
+/// |  - layers highlight styles    |             |    captures                 |
+/// |  + getAttributesForRange()    |             +-----------------------------+
 /// +-------------------------------+
 /// ^
 /// | Sends highlighted runs
@@ -276,7 +276,9 @@ extension Highlighter: StyledRangeContainerDelegate {
             guard let range = NSRange(location: offset, length: run.length).intersection(range) else {
                 continue
             }
-            storage?.setAttributes(attributeProvider.attributesFor(run.value?.capture), range: range)
+            //debug 2503081830 workaround for crash using editor for suggesting text field
+            guard range.upperBound <= storage?.length ?? 0 else { continue }
+            storage?.setAttributes(attributeProvider.attributesFor(run.capture), range: range)
             offset += range.length
         }
 

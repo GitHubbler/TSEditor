@@ -10,21 +10,12 @@
       }
     },
     {
-      "identity" : "codeeditsymbols",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/CodeEditApp/CodeEditSymbols.git",
-      "state" : {
-        "revision" : "ae69712b08571c4469c2ed5cd38ad9f19439793e",
-        "version" : "0.2.3"
-      }
-    },
-    {
       "identity" : "codeedittextview",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/CodeEditApp/CodeEditTextView.git",
       "state" : {
-        "revision" : "c045ffcf4d8b2904e7bd138cdeccda99cba3ab3c",
-        "version" : "0.11.2"
+        "revision" : "a5912e60f6bac25cd1cdf8bb532e1125b21cf7f7",
+        "version" : "0.10.1"
       }
     },
     {
@@ -41,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "revision" : "c1805596154bb3a265fd91b8ac0c4433b4348fb0",
-        "version" : "1.2.0"
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
       }
     },
     {

@@ -1,5 +1,5 @@
 //
-//  RangeStore+Internals.swift
+//  StyledRangeStore+Internals.swift
 //  CodeEditSourceEditor
 //
 //  Created by Khan Winter on 10/25/24
@@ -7,7 +7,7 @@
 
 import _RopeModule
 
-extension RangeStore {
+extension StyledRangeStore {
     /// Coalesce items before and after the given range.
     ///
     /// Compares the next run with the run at the given range. If they're the same, removes the next run and grows the
@@ -16,7 +16,7 @@ extension RangeStore {
     /// rather than the queried one.
     ///
     /// - Parameter range: The range of the item to coalesce around.
-    mutating func coalesceNearby(range: Range<Int>) {
+    func coalesceNearby(range: Range<Int>) {
         var index = findIndex(at: range.lastIndex).index
         if index < _guts.endIndex && _guts.index(after: index) != _guts.endIndex {
             coalesceRunAfter(index: &index)
@@ -30,11 +30,11 @@ extension RangeStore {
     }
 
     /// Check if the run and the run after it are equal, and if so remove the next one and concatenate the two.
-    private mutating func coalesceRunAfter(index: inout Index) {
+    private func coalesceRunAfter(index: inout Index) {
         let thisRun = _guts[index]
         let nextRun = _guts[_guts.index(after: index)]
 
-        if thisRun.compareValue(nextRun) {
+        if thisRun.styleCompare(nextRun) {
             _guts.update(at: &index, by: { $0.length += nextRun.length })
 
             var nextIndex = index

@@ -5,23 +5,15 @@
 //  Created by Khan Winter on 3/16/25.
 //
 
-import AppKit
+import Foundation
 import CodeEditTextView
 
 extension TextViewController: FindPanelTarget {
-    var findPanelTargetView: NSView {
-        textView
-    }
-
     func findPanelWillShow(panelHeight: CGFloat) {
         updateContentInsets()
     }
 
     func findPanelWillHide(panelHeight: CGFloat) {
-        updateContentInsets()
-    }
-
-    func findPanelModeDidChange(to mode: FindPanelMode) {
         updateContentInsets()
     }
 

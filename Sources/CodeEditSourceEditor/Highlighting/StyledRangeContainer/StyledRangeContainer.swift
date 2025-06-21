@@ -18,34 +18,7 @@ protocol StyledRangeContainerDelegate: AnyObject {
 /// See ``runsIn(range:)`` for more details on how conflicting highlights are handled.
 @MainActor
 class StyledRangeContainer {
-    struct StyleElement: RangeStoreElement, CustomDebugStringConvertible {
-        var capture: CaptureName?
-        var modifiers: CaptureModifierSet
-
-        var isEmpty: Bool {
-            capture == nil && modifiers.isEmpty
-        }
-
-        func combineLowerPriority(_ other: StyleElement?) -> StyleElement {
-            StyleElement(
-                capture: self.capture ?? other?.capture,
-                modifiers: modifiers.union(other?.modifiers ?? [])
-            )
-        }
-
-        func combineHigherPriority(_ other: StyleElement?) -> StyleElement {
-            StyleElement(
-                capture: other?.capture ?? self.capture,
-                modifiers: modifiers.union(other?.modifiers ?? [])
-            )
-        }
-
-        var debugDescription: String {
-            "\(capture?.stringValue ?? "(empty)"), \(modifiers)"
-        }
-    }
-
-    var _storage: [ProviderID: RangeStore<StyleElement>] = [:]
+    var _storage: [ProviderID: StyledRangeStore] = [:]
     weak var delegate: StyledRangeContainerDelegate?
 
     /// Initialize the container with a list of provider identifiers. Each provider is given an id, they should be
@@ -55,13 +28,13 @@ class StyledRangeContainer {
     ///   - providers: An array of identifiers given to providers.
     init(documentLength: Int, providers: [ProviderID]) {
         for provider in providers {
-            _storage[provider] = RangeStore<StyleElement>(documentLength: documentLength)
+            _storage[provider] = StyledRangeStore(documentLength: documentLength)
         }
     }
 
     func addProvider(_ id: ProviderID, documentLength: Int) {
         assert(!_storage.keys.contains(id), "Provider already exists")
-        _storage[id] = RangeStore<StyleElement>(documentLength: documentLength)
+        _storage[id] = StyledRangeStore(documentLength: documentLength)
     }
 
     func removeProvider(_ id: ProviderID) {
@@ -82,18 +55,10 @@ class StyledRangeContainer {
     ///
     /// - Parameter range: The range to query.
     /// - Returns: An array of continuous styled runs.
-    func runsIn(range: NSRange) -> [RangeStoreRun<StyleElement>] {
-        func combineLowerPriority(_ lhs: inout RangeStoreRun<StyleElement>, _ rhs: RangeStoreRun<StyleElement>) {
-            lhs.value = lhs.value?.combineLowerPriority(rhs.value) ?? rhs.value
-        }
-
-        func combineHigherPriority(_ lhs: inout RangeStoreRun<StyleElement>, _ rhs: RangeStoreRun<StyleElement>) {
-            lhs.value = lhs.value?.combineHigherPriority(rhs.value) ?? rhs.value
-        }
-
+    func runsIn(range: NSRange) -> [StyledRangeStoreRun] {
         // Ordered by priority, lower = higher priority.
         var allRuns = _storage.sorted(by: { $0.key < $1.key }).map { $0.value.runs(in: range.intRange) }
-        var runs: [RangeStoreRun<StyleElement>] = []
+        var runs: [StyledRangeStoreRun] = []
 
         var minValue = allRuns.compactMap { $0.last }.enumerated().min(by: { $0.1.length < $1.1.length })
 
@@ -105,9 +70,9 @@ class StyledRangeContainer {
             for idx in (0..<allRuns.count).reversed() where idx != minRunIdx {
                 guard let last = allRuns[idx].last else { continue }
                 if idx < minRunIdx {
-                    combineHigherPriority(&minRun, last)
+                    minRun.combineHigherPriority(last)
                 } else {
-                    combineLowerPriority(&minRun, last)
+                    minRun.combineLowerPriority(last)
                 }
 
                 if last.length == minRun.length {
@@ -128,8 +93,8 @@ class StyledRangeContainer {
     }
 
     func storageUpdated(replacedContentIn range: Range<Int>, withCount newLength: Int) {
-        for key in _storage.keys {
-            _storage[key]?.storageUpdated(replacedCharactersIn: range, withCount: newLength)
+        _storage.values.forEach {
+            $0.storageUpdated(replacedCharactersIn: range, withCount: newLength)
         }
     }
 }
@@ -144,11 +109,11 @@ extension StyledRangeContainer: HighlightProviderStateDelegate {
     ///   - rangeToHighlight: The range to apply the highlights to.
     func applyHighlightResult(provider: ProviderID, highlights: [HighlightRange], rangeToHighlight: NSRange) {
         assert(rangeToHighlight != .notFound, "NSNotFound is an invalid highlight range")
-        guard var storage = _storage[provider] else {
+        guard let storage = _storage[provider] else {
             assertionFailure("No storage found for the given provider: \(provider)")
             return
         }
-        var runs: [RangeStoreRun<StyleElement>] = []
+        var runs: [StyledRangeStoreRun] = []
         var lastIndex = rangeToHighlight.lowerBound
 
         for highlight in highlights {
@@ -158,9 +123,10 @@ extension StyledRangeContainer: HighlightProviderStateDelegate {
                 continue // Skip! Overlapping
             }
             runs.append(
-                RangeStoreRun<StyleElement>(
+                StyledRangeStoreRun(
                     length: highlight.range.length,
-                    value: StyleElement(capture: highlight.capture, modifiers: highlight.modifiers)
+                    capture: highlight.capture,
+                    modifiers: highlight.modifiers
                 )
             )
             lastIndex = highlight.range.max
@@ -171,7 +137,6 @@ extension StyledRangeContainer: HighlightProviderStateDelegate {
         }
 
         storage.set(runs: runs, for: rangeToHighlight.intRange)
-        _storage[provider] = storage
         delegate?.styleContainerDidUpdate(in: rangeToHighlight)
     }
 }

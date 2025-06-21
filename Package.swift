@@ -17,17 +17,12 @@ let package = Package(
         // A fast, efficient, text view for code.
         .package(
             url: "https://github.com/CodeEditApp/CodeEditTextView.git",
-            from: "0.11.2"
+            from: "0.10.1"
         ),
         // tree-sitter languages
         .package(
             url: "https://github.com/CodeEditApp/CodeEditLanguages.git",
             exact: "0.1.20"
-        ),
-        // CodeEditSymbols
-        .package(
-            url: "https://github.com/CodeEditApp/CodeEditSymbols.git",
-            exact: "0.2.3"
         ),
         // SwiftLint
         .package(
@@ -48,12 +43,11 @@ let package = Package(
             dependencies: [
                 "CodeEditTextView",
                 "CodeEditLanguages",
-                "TextFormation",
-                "CodeEditSymbols"
+                "TextFormation"
             ],
-            plugins: [
-                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ]
+//            plugins: [
+//                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+//            ]
         ),
 
         // Tests for the source editor
@@ -64,9 +58,9 @@ let package = Package(
                 "CodeEditLanguages",
                 .product(name: "CustomDump", package: "swift-custom-dump")
             ],
-            plugins: [
-                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
-            ]
+//            plugins: [
+//                .plugin(name: "SwiftLint", package: "SwiftLintPlugin")
+//            ]
         ),
     ]
 )

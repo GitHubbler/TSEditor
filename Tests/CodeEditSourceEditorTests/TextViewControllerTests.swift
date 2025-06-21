@@ -162,13 +162,12 @@ final class TextViewControllerTests: XCTestCase {
         controller.findViewController?.showFindPanel(animated: false)
 
         // Extra insets do not effect find panel's insets
-        let findModel = try XCTUnwrap(controller.findViewController)
         try assertInsetsEqual(
             scrollView.contentInsets,
-            NSEdgeInsets(top: 10 + findModel.viewModel.panelHeight, left: 0, bottom: 10, right: 0)
+            NSEdgeInsets(top: 10 + FindPanel.height, left: 0, bottom: 10, right: 0)
         )
         XCTAssertEqual(controller.findViewController?.findPanelVerticalConstraint.constant, 0)
-        XCTAssertEqual(controller.gutterView.frame.origin.y, -10 - findModel.viewModel.panelHeight)
+        XCTAssertEqual(controller.gutterView.frame.origin.y, -10 - FindPanel.height)
     }
 
     func test_editorOverScroll_ZeroCondition() throws {
@@ -460,104 +459,6 @@ final class TextViewControllerTests: XCTestCase {
         XCTAssertFalse(controller.minimapView.isHidden)
         XCTAssertEqual(controller.minimapView.frame.width, MinimapView.maxWidth)
         XCTAssertEqual(controller.textViewInsets.right, MinimapView.maxWidth)
-    }
-
-    // MARK: - Get Overlapping Lines
-
-    func test_getOverlappingLines() {
-        controller.setText("A\nB\nC")
-
-        // Select the entire first line, shouldn't include the second line
-        var lines = controller.getOverlappingLines(for: NSRange(location: 0, length: 2))
-        XCTAssertEqual(0...0, lines)
-
-        // Select the first char of the second line
-        lines = controller.getOverlappingLines(for: NSRange(location: 0, length: 3))
-        XCTAssertEqual(0...1, lines)
-
-        // Select the newline in the first line, and part of the second line
-        lines = controller.getOverlappingLines(for: NSRange(location: 1, length: 2))
-        XCTAssertEqual(0...1, lines)
-
-        // Select until the end of the document
-        lines = controller.getOverlappingLines(for: NSRange(location: 3, length: 2))
-        XCTAssertEqual(1...2, lines)
-
-        // Select just the last line of the document
-        lines = controller.getOverlappingLines(for: NSRange(location: 4, length: 1))
-        XCTAssertEqual(2...2, lines)
-    }
-
-    // MARK: - Invisible Characters
-
-    func test_setInvisibleCharacterConfig() {
-        controller.setText("     Hello world")
-        controller.indentOption = .spaces(count: 4)
-
-        XCTAssertEqual(controller.invisibleCharactersConfig, .empty)
-
-        controller.invisibleCharactersConfig = .init(showSpaces: true, showTabs: true, showLineEndings: true)
-        XCTAssertEqual(
-            controller.invisibleCharactersConfig,
-            .init(showSpaces: true, showTabs: true, showLineEndings: true)
-        )
-        XCTAssertEqual(
-            controller.invisibleCharactersCoordinator.config,
-            .init(showSpaces: true, showTabs: true, showLineEndings: true)
-        )
-
-        // Should emphasize the 4th space
-        XCTAssertEqual(
-            controller.invisibleCharactersCoordinator.invisibleStyle(
-                for: InvisibleCharactersConfig.Symbols.space,
-                at: NSRange(location: 3, length: 1),
-                lineRange: NSRange(location: 0, length: 15)
-            ),
-            .replace(
-                replacementCharacter: "·",
-                color: controller.theme.invisibles.color,
-                font: controller.invisibleCharactersCoordinator.emphasizedFont
-            )
-        )
-        XCTAssertEqual(
-            controller.invisibleCharactersCoordinator.invisibleStyle(
-                for: InvisibleCharactersConfig.Symbols.space,
-                at: NSRange(location: 4, length: 1),
-                lineRange: NSRange(location: 0, length: 15)
-            ),
-            .replace(
-                replacementCharacter: "·",
-                color: controller.theme.invisibles.color,
-                font: controller.font
-            )
-        )
-
-        if case .emphasize = controller.invisibleCharactersCoordinator.invisibleStyle(
-            for: InvisibleCharactersConfig.Symbols.tab,
-            at: .zero,
-            lineRange: .zero
-        ) {
-            XCTFail("Incorrect character style for invisible character")
-        }
-    }
-
-    // MARK: - Warning Characters
-
-    func test_setWarningCharacterConfig() {
-        XCTAssertEqual(controller.warningCharacters, [])
-
-        controller.warningCharacters = [0, 1]
-
-        XCTAssertEqual(controller.warningCharacters, [0, 1])
-        XCTAssertEqual(controller.invisibleCharactersCoordinator.warningCharacters, [0, 1])
-
-        if case .replace = controller.invisibleCharactersCoordinator.invisibleStyle(
-            for: 0,
-            at: .zero,
-            lineRange: .zero
-        ) {
-            XCTFail("Incorrect character style for warning character")
-        }
     }
 }
 // swiftlint:enable all

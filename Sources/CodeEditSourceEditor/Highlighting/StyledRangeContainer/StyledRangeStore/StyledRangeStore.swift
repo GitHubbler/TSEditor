@@ -1,5 +1,5 @@
 //
-//  RangeStore.swift
+//  StyledRangeStore.swift
 //  CodeEditSourceEditor
 //
 //  Created by Khan Winter on 10/24/24
@@ -7,18 +7,15 @@
 
 import _RopeModule
 
-/// RangeStore is a container type that allows for setting and querying values for relative ranges in text. The
-/// container reflects a text document in that its length needs to be kept up-to-date. It can efficiently remove and
-/// replace subranges even for large documents. Provides helper methods for keeping some state in-sync with a text
-/// document's content.
+/// StyledRangeStore is a container type that allows for setting and querying captures and modifiers for syntax
+/// highlighting. The container reflects a text document in that its length needs to be kept up-to-date.
 ///
 /// Internally this class uses a `Rope` from the swift-collections package, allowing for efficient updates and
 /// retrievals.
-struct RangeStore<Element: RangeStoreElement>: Sendable {
-    typealias Run = RangeStoreRun<Element>
-    typealias RopeType = Rope<StoredRun>
-    typealias Index = RopeType.Index
-    var _guts = RopeType()
+final class StyledRangeStore {
+    typealias Run = StyledRangeStoreRun
+    typealias Index = Rope<StyledRun>.Index
+    var _guts = Rope<StyledRun>()
 
     var length: Int {
         _guts.count(in: OffsetMetric())
@@ -29,7 +26,7 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
     private var cache: (range: Range<Int>, runs: [Run])?
 
     init(documentLength: Int) {
-        self._guts = RopeType([StoredRun(length: documentLength, value: nil)])
+        self._guts = Rope([StyledRun(length: documentLength, capture: nil, modifiers: [])])
     }
 
     // MARK: - Core
@@ -38,6 +35,17 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
     /// - Parameter range: The range to query.
     /// - Returns: A continuous array of runs representing the queried range.
     func runs(in range: Range<Int>) -> [Run] {
+        
+        //debug 2503041713 assertion failed. Trying a workaround:
+        var range = range // in; mutable for possible adjustment
+        if range.upperBound > _guts.count(in: OffsetMetric()) { // upperBound outside valid range
+        let existingLength = range.length
+//        range.length = _guts.count(in: OffsetMetric()) CAN'T SET--workaround follows:
+        let overshoot = existingLength - _guts.count(in: OffsetMetric())
+        let newRange = Range<Int>(lowerBound: range.lowerBound, length: existingLength - overshoot)
+        range = newRange
+        }
+        
         assert(range.lowerBound >= 0, "Negative lowerBound")
         assert(range.upperBound <= _guts.count(in: OffsetMetric()), "upperBound outside valid range")
         if let cache, cache.range == range {
@@ -51,7 +59,7 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
 
         while index < _guts.endIndex {
             let run = _guts[index]
-            runs.append(Run(length: run.length - (offset ?? 0), value: run.value))
+            runs.append(Run(length: run.length - (offset ?? 0), capture: run.capture, modifiers: run.modifiers))
 
             index = _guts.index(after: index)
             offset = nil
@@ -60,21 +68,32 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
         return runs
     }
 
-    /// Sets a value for a range.
+    /// Sets a capture and modifiers for a range.
     /// - Parameters:
-    ///   - value: The value to set for the given range.
+    ///   - capture: The capture to set.
+    ///   - modifiers: The modifiers to set.
     ///   - range: The range to write to.
-    mutating func set(value: Element, for range: Range<Int>) {
+    func set(capture: CaptureName, modifiers: CaptureModifierSet, for range: Range<Int>) {
         assert(range.lowerBound >= 0, "Negative lowerBound")
         assert(range.upperBound <= _guts.count(in: OffsetMetric()), "upperBound outside valid range")
-        set(runs: [Run(length: range.length, value: value)], for: range)
+        set(runs: [Run(length: range.length, capture: capture, modifiers: modifiers)], for: range)
     }
 
     /// Replaces a range in the document with an array of runs.
     /// - Parameters:
     ///   - runs: The runs to insert.
     ///   - range: The range to replace.
-    mutating func set(runs: [Run], for range: Range<Int>) {
+    func set(runs: [Run], for range: Range<Int>) {
+        
+        // debug 2503041126 Rope utility has a bug--the following trips:
+        //        precondition(
+        //          bounds.lowerBound >= 0 && bounds.upperBound <= size,
+        //          "Range out of bounds")
+        // this may be a workaround
+        guard range.lowerBound >= 0 && range.upperBound <= OffsetMetric().size(of: _guts.summary) else {
+            return
+        }
+        
         let gutsRange = 0..<_guts.count(in: OffsetMetric())
         if range.clamped(to: gutsRange) != range {
             let upperBound = range.clamped(to: gutsRange).upperBound
@@ -85,7 +104,7 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
         _guts.replaceSubrange(
             range,
             in: OffsetMetric(),
-            with: runs.map { StoredRun(length: $0.length, value: $0.value) }
+            with: runs.map { StyledRun(length: $0.length, capture: $0.capture, modifiers: $0.modifiers) }
         )
 
         coalesceNearby(range: range)
@@ -95,9 +114,9 @@ struct RangeStore<Element: RangeStoreElement>: Sendable {
 
 // MARK: - Storage Sync
 
-extension RangeStore {
+extension StyledRangeStore {
     /// Handles keeping the internal storage in sync with the document.
-    mutating func storageUpdated(replacedCharactersIn range: Range<Int>, withCount newLength: Int) {
+    func storageUpdated(replacedCharactersIn range: Range<Int>, withCount newLength: Int) {
         assert(range.lowerBound >= 0, "Negative lowerBound")
         assert(range.upperBound <= _guts.count(in: OffsetMetric()), "upperBound outside valid range")
 

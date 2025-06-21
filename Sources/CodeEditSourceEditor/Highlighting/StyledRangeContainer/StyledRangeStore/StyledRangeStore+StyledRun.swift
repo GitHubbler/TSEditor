@@ -1,38 +1,31 @@
 //
-//  RangeStore+StoredRun.swift
+//  StyledRangeStore+StyledRun.swift
 //  CodeEditSourceEditor
 //
 //  Created by Khan Winter on 10/25/24
 
 import _RopeModule
 
-extension RangeStore {
-    struct StoredRun {
+extension StyledRangeStore {
+    struct StyledRun {
         var length: Int
-        let value: Element?
+        let capture: CaptureName?
+        let modifiers: CaptureModifierSet
 
         static func empty(length: Int) -> Self {
-            StoredRun(length: length, value: nil)
+            StyledRun(length: length, capture: nil, modifiers: [])
         }
 
         /// Compare two styled ranges by their stored styles.
         /// - Parameter other: The range to compare to.
         /// - Returns: The result of the comparison.
-        func compareValue(_ other: Self) -> Bool {
-            return if let lhs = value, let rhs = other.value {
-                lhs == rhs
-            } else if let lhs = value {
-                lhs.isEmpty
-            } else if let rhs = other.value {
-                rhs.isEmpty
-            } else {
-                true
-            }
+        func styleCompare(_ other: Self) -> Bool {
+            capture == other.capture && modifiers == other.modifiers
         }
     }
 }
 
-extension RangeStore.StoredRun: RopeElement {
+extension StyledRangeStore.StyledRun: RopeElement {
     typealias Index = Int
 
     var summary: Summary { Summary(length: length) }
@@ -57,34 +50,34 @@ extension RangeStore.StoredRun: RopeElement {
 
     mutating func split(at index: Self.Index) -> Self {
         assert(index >= 0 && index <= length)
-        let tail = Self(length: length - index, value: value)
+        let tail = Self(length: length - index, capture: capture, modifiers: modifiers)
         length = index
         return tail
     }
 }
 
-extension RangeStore.StoredRun {
+extension StyledRangeStore.StyledRun {
     struct Summary {
         var length: Int
     }
 }
 
-extension RangeStore.StoredRun.Summary: RopeSummary {
+extension StyledRangeStore.StyledRun.Summary: RopeSummary {
     // FIXME: This is entirely arbitrary. Benchmark this.
     @inline(__always)
     static var maxNodeSize: Int { 10 }
 
     @inline(__always)
-    static var zero: RangeStore.StoredRun.Summary { Self(length: 0) }
+    static var zero: StyledRangeStore.StyledRun.Summary { Self(length: 0) }
 
     @inline(__always)
     var isZero: Bool { length == 0 }
 
-    mutating func add(_ other: RangeStore.StoredRun.Summary) {
+    mutating func add(_ other: StyledRangeStore.StyledRun.Summary) {
         length += other.length
     }
 
-    mutating func subtract(_ other: RangeStore.StoredRun.Summary) {
+    mutating func subtract(_ other: StyledRangeStore.StyledRun.Summary) {
         length -= other.length
     }
 }
