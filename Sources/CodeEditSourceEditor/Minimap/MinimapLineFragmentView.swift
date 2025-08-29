@@ -43,14 +43,14 @@ final class MinimapLineFragmentView: LineFragmentView {
 
     /// Set the new line fragment, and calculate drawing runs for drawing the fragment in the view.
     /// - Parameter newFragment: The new fragment to use.
-    override func setLineFragment(
+    func setLineFragment(
         _ newFragment: LineFragment,
         renderer: LineFragmentRenderer?
     ) {
         guard let actualRenderer = renderer else {
             return
         }
-        super.setLineFragment(newFragment, renderer: actualRenderer)
+        super.setLineFragment(newFragment, fragmentRange: NSRange(), renderer: actualRenderer)
         guard let textStorage else { return }
 
         // Create the drawing runs using attribute information
