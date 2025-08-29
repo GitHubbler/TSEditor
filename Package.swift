@@ -42,7 +42,8 @@ let package = Package(
         .target(
             name: "CodeEditSourceEditor",
             dependencies: [
-                "CodeEditTextView",
+//                "CodeEditTextView",
+                .product(name: "CodeEditTextView", package: "tstextview"),
                 "CodeEditLanguages",
                 "TextFormation"
             ],
