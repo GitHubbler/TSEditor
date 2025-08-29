@@ -16,19 +16,20 @@ let package = Package(
     dependencies: [
         // A fast, efficient, text view for code.
         .package(
-            url: "https://github.com/CodeEditApp/CodeEditTextView.git",
-            from: "0.10.1"
+//            url: "https://github.com/CodeEditApp/CodeEditTextView.git",
+            url: "https://github.com/GitHubbler/TSTextView.git",
+            branch: "foraluminium"
         ),
         // tree-sitter languages
         .package(
             url: "https://github.com/CodeEditApp/CodeEditLanguages.git",
             exact: "0.1.20"
         ),
-        // SwiftLint
-        .package(
-            url: "https://github.com/lukepistrol/SwiftLintPlugin",
-            from: "0.2.2"
-        ),
+//        // SwiftLint
+//        .package(
+//            url: "https://github.com/lukepistrol/SwiftLintPlugin",
+//            from: "0.2.2"
+//        ),
         // Rules for indentation, pair completion, whitespace
         .package(
             url: "https://github.com/ChimeHQ/TextFormation",
