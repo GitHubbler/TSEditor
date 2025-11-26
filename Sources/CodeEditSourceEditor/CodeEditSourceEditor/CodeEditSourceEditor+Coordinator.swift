@@ -56,9 +56,7 @@ extension CodeEditSourceEditor {
                 return
             }
             if case .binding(let binding) = text {
-                Task { @MainActor in
-                    binding.wrappedValue = textView.string
-                }
+                binding.wrappedValue = textView.string
             }
         }
 
