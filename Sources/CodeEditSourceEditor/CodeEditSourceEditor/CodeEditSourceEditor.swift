@@ -20,7 +20,9 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         case binding(Binding<String>)
         case storage(NSTextStorage)
     }
-
+    
+    private let accessibilityID: String? // for Aluminium UI testing
+    
     /// Initializes a Text Editor
     /// - Parameters:
     ///   - text: The text content
@@ -77,7 +79,8 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         coordinators: [any TextViewCoordinator] = [],
         showMinimap: Bool,
         reformatAtColumn: Int,
-        showReformattingGuide: Bool
+        showReformattingGuide: Bool,
+        accessibilityID: String?, // for Aluminium UI testing
     ) {
         self.text = .binding(text)
         self.language = language
@@ -107,6 +110,7 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         self.showMinimap = showMinimap
         self.reformatAtColumn = reformatAtColumn
         self.showReformattingGuide = showReformattingGuide
+        self.accessibilityID = accessibilityID
     }
 
     /// Initializes a Text Editor
@@ -193,6 +197,7 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         self.showMinimap = showMinimap
         self.reformatAtColumn = reformatAtColumn
         self.showReformattingGuide = showReformattingGuide
+        self.accessibilityID = nil
     }
 
     package var text: TextAPI
@@ -258,6 +263,15 @@ public struct CodeEditSourceEditor: NSViewControllerRepresentable {
         if controller.textView == nil {
             controller.loadView()
         }
+        
+        // for Aluminium UI testing
+        // Assign the accessibility identifier to the actual TextView
+                if let accessibilityID = accessibilityID {
+                    controller.textView.setAccessibilityIdentifier(accessibilityID)
+                    // Optional but recommended: set the role so it appears as a .textView in XCUITest
+                    controller.textView.setAccessibilityRole(.textArea)
+                }
+
         if !cursorPositions.isEmpty {
             controller.setCursorPositions(cursorPositions.wrappedValue)
         }

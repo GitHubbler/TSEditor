@@ -58,7 +58,8 @@ struct ContentView: View {
                     useSystemCursor: useSystemCursor,
                     showMinimap: showMinimap,
                     reformatAtColumn: reformatAtColumn,
-                    showReformattingGuide: showReformattingGuide
+                    showReformattingGuide: showReformattingGuide,
+                    accessibilityID: "forAluminiumUITestsOnly",
                 )
                 .overlay(alignment: .bottom) {
                     StatusBar(
